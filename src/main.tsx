@@ -1,6 +1,5 @@
 import {StrictMode, Suspense, lazy} from 'react';
 import {createRoot} from 'react-dom/client';
-import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
 import { installNativePrint } from './utils/printHtml';
 
