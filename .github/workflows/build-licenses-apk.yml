@@ -1,0 +1,60 @@
+name: Build Licenses APK
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      # تطبيق التراخيص له appId واسم مختلفين، فبيتثبّت جنب تطبيق البنا وتطبيق السائق على نفس الموبايل
+      - name: Use licenses Capacitor config
+        run: cp capacitor.licenses.config.ts capacitor.config.ts
+
+      # رابط Supabase والمفتاح العام (Publishable) بيتقروا من .env.licenses
+      - name: Build web app (licenses mode)
+        run: npx vite build --mode licenses
+
+      - name: Add Android platform
+        run: |
+          npx cap add android
+          # رقم الإصدار بيزيد مع كل بناء (عشان التحديث فوق النسخة القديمة يشتغل)
+          sed -i 's/versionCode 1$/versionCode ${{ github.run_number }}/; s/versionName "1.0"/versionName "1.0.${{ github.run_number }}"/' android/app/build.gradle
+          npx cap sync android
+
+      # مفتاح توقيع ثابت: من غيره GitHub بيولّد مفتاح debug جديد كل مرة فالتحديث فوق نسخة مثبّتة بيفشل
+      - name: Use stable debug keystore
+        run: |
+          mkdir -p ~/.android
+          cp ci/debug.keystore ~/.android/debug.keystore
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Name the APK
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk out/elbanna-licenses.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: elbanna-licenses-apk
+          path: out/elbanna-licenses.apk

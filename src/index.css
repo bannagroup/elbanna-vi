@@ -1,0 +1,521 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Cairo', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  direction: rtl;
+  text-align: right;
+  background-color: #020617;
+  color: #f1f5f9;
+}
+
+/* Bento Grid Globals & Overrides - Scoped to #root only so they don't leak into the print portal */
+#root .bg-white {
+  background-color: #0f172a !important; /* Slate-900 */
+}
+
+/* Card outlines and shadows */
+#root .border-slate-100, 
+#root .border-slate-150, 
+#root .border-slate-200 {
+  border-color: #1e293b !important; /* Slate-800 */
+}
+
+/* Text color overrides */
+#root .text-slate-900, 
+#root .text-slate-800, 
+#root .text-slate-700 {
+  color: #f8fafc !important; /* slate-50 */
+}
+
+#root .text-slate-650, 
+#root .text-slate-600, 
+#root .text-slate-500 {
+  color: #94a3b8 !important; /* slate-400 */
+}
+
+#root .bg-slate-50, 
+#root .bg-slate-100 {
+  background-color: #020617 !important; /* slate-950 */
+}
+
+/* Input elements */
+#root input, 
+#root select, 
+#root textarea, 
+#root option {
+  background-color: #020617 !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #1e293b !important;
+}
+
+#root input:focus, 
+#root select:focus, 
+#root textarea:focus {
+  border-color: #10b981 !important; /* Emerald-500 focus glow */
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15) !important;
+}
+
+#root input::placeholder {
+  color: #475569 !important;
+}
+
+/* Table zebra striping in dark layout */
+#root table th {
+  background-color: #020617 !important;
+  color: #94a3b8 !important;
+}
+
+#root tr:nth-child(even) {
+  background-color: #0f172a !important;
+}
+
+#root tr:nth-child(odd) {
+  background-color: #020617 !important;
+}
+
+#root tr {
+  border-bottom: 1px solid #1e293b !important;
+}
+
+/* Button & interactive hover enhancements */
+#root .hover\:bg-slate-100:hover, 
+#root .hover\:bg-slate-50:hover {
+  background-color: #1e293b !important;
+}
+
+#root .hover\:shadow-md:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5) !important;
+  border-color: #334155 !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Custom print layouts for A5 documents and general A4 reports */
+@media print {
+  /* Default page configuration: crisp A4 portrait for normal reports */
+  @page {
+    size: A4 portrait;
+    margin: 15mm 10mm 15mm 10mm;
+  }
+
+  /* Named page format for A5 portrait receipts / slips */
+  @page a5_slip {
+    size: A5 portrait;
+    margin: 0;
+  }
+
+  /* Repeat table column titles (thead) automatically on every subsequent page */
+  thead {
+    display: table-header-group !important;
+  }
+  
+  tfoot {
+    display: table-footer-group !important;
+  }
+
+  /* Prevent row division / table rows from splitting awkwardly across pages */
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Ensure smooth content printing without cutoff */
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* When A5 print is active, completely hide the main application wrapper and any toolbars/controls */
+  body.a5-print-active #root,
+  body.a5-print-active .no-print,
+  body.a5-print-active .modal-toolbar,
+  body.a5-print-active button,
+  body.a5-print-active svg,
+  body.a5-print-active iframe {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Force show only the A5 print preview container and its children when A5 is active */
+  body.a5-print-active #a5_print_preview_modal {
+    display: block !important;
+    visibility: visible !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    z-index: 9999999 !important;
+    overflow: visible !important;
+  }
+
+  body.a5-print-active #a5_print_preview_modal * {
+    visibility: visible !important;
+  }
+
+  /* If NOT printing A5 modal (i.e. printing standard general reports) */
+  body:not(.a5-print-active) .no-print,
+  body:not(.a5-print-active) #elbanna_main_header,
+  body:not(.a5-print-active) #elbanna_sidebar,
+  body:not(.a5-print-active) button,
+  body:not(.a5-print-active) footer,
+  body:not(.a5-print-active) .modal-toolbar,
+  body:not(.a5-print-active) .no-print-area {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  body:not(.a5-print-active) #root {
+    display: block !important;
+    visibility: visible !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  body:not(.a5-print-active) #main_content_frame {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Ensure standard printed reports are colored black on white cleanly and fit on page */
+  body:not(.a5-print-active) #reports_tab_container,
+  body:not(.a5-print-active) #reports_tab_container * {
+    background-color: transparent !important;
+    background: transparent !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Premium high-contrast table typography for standard on-page report printed records */
+  body:not(.a5-print-active) table {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 10px !important;
+    margin-bottom: 25px !important;
+    page-break-inside: auto;
+  }
+
+  body:not(.a5-print-active) table th,
+  body:not(.a5-print-active) table td {
+    border: 1px solid #64748b !important;
+    padding: 5px 6px !important;
+    font-size: 8.5pt !important; /* Scaled down slightly to fit all columns seamlessly on printed A4 */
+    font-family: 'Cairo', 'Inter', system-ui, sans-serif !important;
+    line-height: 1.3 !important;
+    text-align: right !important;
+  }
+
+  body:not(.a5-print-active) table th {
+    background-color: #f1f5f9 !important;
+    color: #000000 !important;
+    font-weight: bold !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body:not(.a5-print-active) tbody tr:nth-child(even) {
+    background-color: #f8fafc !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Retain red/green semantic text shades for financial/violation statuses under print */
+  body:not(.a5-print-active) .text-emerald-450,
+  body:not(.a5-print-active) .text-emerald-400,
+  body:not(.a5-print-active) .text-emerald-500 {
+    color: #16a34a !important; /* green-600 */
+    font-weight: bold !important;
+  }
+
+  body:not(.a5-print-active) .text-red-400,
+  body:not(.a5-print-active) .text-red-500,
+  body:not(.a5-print-active) .text-rose-400,
+  body:not(.a5-print-active) .text-rose-500 {
+    color: #dc2626 !important; /* red-600 */
+    font-weight: bold !important;
+  }
+
+  body:not(.a5-print-active) .text-amber-400,
+  body:not(.a5-print-active) .text-amber-500 {
+    color: #d97706 !important; /* amber-600 */
+    font-weight: bold !important;
+  }
+
+  .printable-wrapper {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .no-print-modal-container {
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  /* Force print formatting exactly matching standard A5 sheets (148mm x 210mm) */
+  #a5_print_document {
+    page: a5_slip !important; /* Enforces named A5 print settings */
+    display: block !important;
+    position: absolute !important;
+    top: 5mm !important;
+    right: 5mm !important;
+    width: 138mm !important;
+    height: 200mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    font-family: 'Cairo', 'Inter', system-ui, sans-serif !important;
+    font-size: 10pt !important;
+    direction: rtl !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    page-break-inside: avoid;
+  }
+
+  /* Enforce table backgrounds and line borders */
+  #a5_print_document table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  #a5_print_document table td {
+    border: 1px solid #cbd5e1 !important;
+  }
+
+  #a5_print_document tr:nth-child(even) {
+    background-color: #f8fafc !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #a5_print_document tr:nth-child(odd) {
+    background-color: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Universal styling rules for the print document (applies in screen preview and print mode) */
+.font-print-styles {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  font-family: 'Cairo', 'Inter', system-ui, sans-serif !important;
+}
+
+/* Numbers/codes in the license invoice (plate no., invoice no., dates, national ID, phone, amounts) */
+.font-print-styles .font-mono,
+#a5_print_document .font-mono {
+  font-family: 'Calibri', 'JetBrains Mono', monospace !important;
+}
+
+.font-print-styles *,
+#a5_print_document * {
+  color: #1e293b;
+  border-color: #cbd5e1 !important;
+}
+
+/* Force specific corporate colors and badge styling to persist and render beautifully */
+.font-print-styles .text-indigo-700,
+#a5_print_document .text-indigo-700 {
+  color: #4338ca !important; /* indgo-700 */
+}
+
+.font-print-styles .text-emerald-700,
+#a5_print_document .text-emerald-700 {
+  color: #047857 !important; /* emerald-700 */
+}
+
+.font-print-styles .text-emerald-600,
+#a5_print_document .text-emerald-600 {
+  color: #059669 !important; /* emerald-600 */
+}
+
+.font-print-styles .text-rose-600,
+.font-print-styles .text-rose-700,
+#a5_print_document .text-rose-600,
+#a5_print_document .text-rose-700 {
+  color: #be123c !important; /* rose-700 */
+}
+
+.font-print-styles .text-red-700,
+#a5_print_document .text-red-700 {
+  color: #b91c1c !important; /* red-700 */
+}
+
+.font-print-styles .text-sky-400,
+.font-print-styles .text-sky-600,
+#a5_print_document .text-sky-400,
+#a5_print_document .text-sky-600 {
+  color: #0284c7 !important; /* sky-600 */
+}
+
+.font-print-styles .text-slate-400,
+.font-print-styles .text-slate-500,
+#a5_print_document .text-slate-400,
+#a5_print_document .text-slate-500 {
+  color: #475569 !important; /* intermediate neutral */
+}
+
+.font-print-styles .text-slate-900,
+.font-print-styles .text-slate-950,
+#a5_print_document .text-slate-900,
+#a5_print_document .text-slate-950 {
+  color: #0f172a !important; /* deep slate-900 */
+}
+
+/* Table Header must be absolutely White with Black text both on screen and print! */
+.font-print-styles thead tr,
+.font-print-styles table th,
+.font-print-styles table th *,
+#a5_print_document thead tr,
+#a5_print_document table th,
+#a5_print_document table th * {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.font-print-styles tr:nth-child(even) {
+  background-color: #f8fafc !important;
+}
+
+.font-print-styles tr:nth-child(odd) {
+  background-color: #ffffff !important;
+}
+
+
+
+/* ===== جداول الإدخال بنمط Excel + تثبيت العناوين وأول عمود (xl-*) ===== */
+.xl-wrap { overflow: auto; position: relative; border: 1px solid #1e293b; border-radius: 12px; }
+.xl-table { border-collapse: separate; border-spacing: 0; width: max-content; min-width: 100%; font-size: 12px; }
+.xl-table th, .xl-table td { border-bottom: 1px solid #1e293b; border-inline-start: 1px solid #1e293b; padding: 0; }
+/* صف العناوين مثبّت في أعلى الجدول */
+#root .xl-table thead th { position: sticky; top: 0; z-index: 20; background-color: #020617 !important; padding: 8px 10px; white-space: nowrap; text-align: right; }
+#root .xl-table thead th.xl-sortable { cursor: pointer; user-select: none; }
+#root .xl-table thead th.xl-sortable:hover { color: #e2e8f0 !important; }
+.xl-sort-ind { margin-inline-start: 6px; font-size: 10px; opacity: .7; }
+/* أول عمود مثبّت (على اليمين في الواجهة العربية) */
+#root .xl-table .xl-sticky-col { position: sticky; inset-inline-start: 0; z-index: 10; background-color: #0b1224 !important; }
+#root .xl-table thead th.xl-sticky-col { z-index: 30; background-color: #020617 !important; }
+#root .xl-table tfoot td { position: sticky; bottom: 0; z-index: 15; background-color: #0b1224 !important; font-weight: 800; padding: 8px 10px; }
+#root .xl-table tfoot td.xl-sticky-col { z-index: 25; }
+.xl-td.xl-ro { padding: 6px 10px; white-space: nowrap; }
+#root .xl-table input.xl-input,
+#root .xl-table select.xl-input { width: 100%; min-width: 90px; height: 34px; padding: 4px 8px; border: 0 !important; border-radius: 0; background: transparent !important; color: #f1f5f9 !important; outline: none; font-size: 12px; }
+#root .xl-table input.xl-num { text-align: right; font-family: var(--font-mono); }
+#root .xl-table input.xl-input:focus,
+#root .xl-table select.xl-input:focus { box-shadow: inset 0 0 0 2px #10b981 !important; background: rgba(16, 185, 129, 0.08) !important; }
+#root .xl-table td.xl-dirty { background-color: rgba(14, 165, 233, 0.16) !important; }
+#root .xl-table input.xl-input:disabled,
+#root .xl-table select.xl-input:disabled { opacity: .55; cursor: not-allowed; }
+.xl-empty { padding: 28px; text-align: center; color: #64748b; font-weight: 700; }
+@media print { .xl-wrap { max-height: none !important; overflow: visible !important; } }
+
+/* جداول عادية (مش إدخال): الحاوية class="xl-wrap" والجدول class="xl-table xl-plain" — نفس تثبيت العناوين وأول عمود */
+.xl-table.xl-plain td { padding: 8px 10px; }
+
+/* الشاشات الكاملة على الموبايل (مسودة الترخيص / أرشيف الفواتير):
+   - تسمح بالتحريك أفقي ورأسي وبالتكبير والتصغير بالإصبعين
+   - تخلّي أي عنصر يتقلّص بدل ما يوسّع الشاشة ويتقطع من الشمال
+   داخل @layer base عشان أي min-w / max-w مكتوبة صراحة على عنصر تفضل هي الأقوى */
+.mobile-fit {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y pinch-zoom;
+}
+@layer base {
+  .mobile-fit div,
+  .mobile-fit h2,
+  .mobile-fit h3,
+  .mobile-fit h4,
+  .mobile-fit p,
+  .mobile-fit label,
+  .mobile-fit span,
+  .mobile-fit select,
+  .mobile-fit input,
+  .mobile-fit textarea {
+    min-width: 0;
+  }
+  .mobile-fit select,
+  .mobile-fit input,
+  .mobile-fit textarea {
+    max-width: 100%;
+  }
+  .mobile-fit h2,
+  .mobile-fit h3,
+  .mobile-fit h4,
+  .mobile-fit p,
+  .mobile-fit label,
+  .mobile-fit button {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* MOBILE-FIRST-GLOBAL — تحسينات عامة للموبايل (أقل من 768px) على كل الشاشات */
+@media screen and (max-width: 767px) {
+  /* الجداول: سكرول أفقي بدل ما توسّع الصفحة */
+  #root table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  /* الصفوف اللي فيها عنصرين على الأطراف: لو ضاقت المساحة العنصر ينزل سطر جديد بدل ما يتراكب */
+  #root .flex.justify-between {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+  /* الشبكات الضيقة: عمودين بالكتير بدل 3 و4 و5 و6 */
+  #root :is(.grid-cols-3, .grid-cols-4, .grid-cols-5, .grid-cols-6) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* الأزرار ماتزيدش عن عرض الشاشة والنص الطويل ينزل سطر */
+  #root button {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+}
